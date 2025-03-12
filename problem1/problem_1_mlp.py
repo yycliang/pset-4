@@ -6,7 +6,10 @@ to `out_features`-dimensional points (e.g., 1D color values). To make your
 implementation more general, also let the user specify any activation function.
 """
 
+import torch
 import torch.nn as nn
+from typing import Tuple
+import jaxtyping
 
 class MLP(nn.Module):
     def __init__(
@@ -32,9 +35,19 @@ class MLP(nn.Module):
         """Build the network according to the provided hyperparameters."""
         raise NotImplementedError("Not implemented!")
     
-    def forward(self, x):
+    def forward(self, coords: jaxtyping.Float[torch.Tensor, "N D"]) -> Tuple[
+        jaxtyping.Float[torch.Tensor, "N out_features"],
+        jaxtyping.Float[torch.Tensor, "N D"],
+    ]:
         """
-        Implement a forward pass where the output AND the input require
-        gradients so as to be differentiable.
+        Implement a forward pass where the output AND the input require gradients so as to be differentiable.
+
+        Return: tuple of (outputs, gradient-enabled coords). Shape of outputs should be (N, out_features).
+
+        Hint: coords should be (N, d) where N is the number of points (batch size) and d is the dimensionality
+        if your input/field. Copy them and enable gradients on the copy. Then, pass them into your network
+        recalling that that in `utils.py` we use the convention that the input values are in [-1, 1] where
+        -1 means "furthest left" or "furthest bottom" (depending on the dimension) and 1 means "furthest right"
+        or "furthest top".
         """
         raise NotImplementedError("Not implemented!")
