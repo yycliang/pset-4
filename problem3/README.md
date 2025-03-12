@@ -114,7 +114,7 @@ For Problem-3, you don’t need to submit code. Please ensure you have passed th
 
 
 
-Otherwise, you will lose points. Submit your work using Canvas.
+Otherwise, you will lose points. Submit your work using Gradescope.
 
 ## Bug Bounty
 

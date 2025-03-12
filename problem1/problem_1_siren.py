@@ -1,12 +1,21 @@
 """
 Implement a neural field using a SIREN.
 
-The SIREN maps from `in_features`-dimensional points (e.g., 2D xy positions) 
+The SIREN maps from `in_features`-dimensional points (e.g., 2D xy positions)
 to `out_features`-dimensional points (e.g., 1D color values). Pay special
 attention to the paper linked in the README when implementing this model.
+
+Some conventions we use that you will need to follow IF you want to use the unit tests:
+1. If the last layer is linear, then it always has a bias (other terms have a bias IFF self.bias is True)
+2. There is one layer from `in_features` to `hidden_features` and then `hidden_layers` layers from 
+    `hidden_features` to `hidden_features`; the last layer (which could be linear or not) is from
+    `hidden_features` to `out_features`.
 """
+
 import torch
 import torch.nn as nn
+import jaxtyping
+from typing import Tuple
 
 
 class SineLayer(nn.Module):
@@ -24,14 +33,14 @@ class SineLayer(nn.Module):
         self.init_weights(is_first_layer, in_features)
 
     @torch.no_grad()
-    def init_weights(self, is_first_layer, in_features):
+    def init_weights(self, is_first_layer: bool, in_features: int):
         """
         Initialize the weights of the layer according to the scheme
         described in the SIREN paper.
         """
         raise NotImplementedError("Not implemented!")
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         raise NotImplementedError("Not implemented!")
 
 
@@ -65,9 +74,19 @@ class SIREN(nn.Module):
         """
         raise NotImplementedError("Not implemented!")
 
-    def forward(self, x):
+    def forward(self, coords: jaxtyping.Float[torch.Tensor, "N D"]) -> Tuple[
+        jaxtyping.Float[torch.Tensor, "N out_features"],
+        jaxtyping.Float[torch.Tensor, "N D"],
+    ]:
         """
-        Implement a forward pass where the output AND the input require
-        gradients so as to be differentiable.
+        Implement a forward pass where the output AND the input require gradients so as to be differentiable.
+
+        Return: tuple of (outputs, gradient-enabled coords). Shape of outputs should be (N, out_features).
+
+        Hint: coords should be (N, d) where N is the number of points (batch size) and d is the dimensionality
+        if your input/field. Copy them and enable gradients on the copy. Then, pass them into your network
+        recalling that that in `utils.py` we use the convention that the input values are in [-1, 1] where
+        -1 means "furthest left" or "furthest bottom" (depending on the dimension) and 1 means "furthest right"
+        or "furthest top".
         """
         raise NotImplementedError("Not implemented!")

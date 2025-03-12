@@ -118,7 +118,7 @@ For problem-3, you don't need to submit the codes. You just need to submit a rep
 
 
 
-Otherwise, you will lose points. Submit your work using Canvas.
+Otherwise, you will lose points. Submit your work using Gradescope.
 
 ## Bug Bounty
 
