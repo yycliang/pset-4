@@ -4,6 +4,13 @@ Implement a neural field using a simple MLP.
 The MLP maps from `in_features`-dimensional points (e.g., 2D xy positions) 
 to `out_features`-dimensional points (e.g., 1D color values). To make your
 implementation more general, also let the user specify any activation function.
+
+Some conventions we use that you will need to follow IF you want to use the unit tests:
+1. The last layer is always linear.
+2. All layers have bias IFF self.bias is True.
+3. There is one linear+activation function layer from the input (`in_features`) to `hidden_features` and then `hidden_layers-1` 
+    linear+activation function layers from `hidden_features` to `hidden_features`, and then a linear layer from `hidden_features`
+    to `out_features`.
 """
 
 import torch

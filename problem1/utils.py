@@ -5,7 +5,19 @@ from skimage.data import astronaut
 from skimage.color import rgb2gray
 from torch.utils.data import Dataset
 from torchvision.transforms import Compose, Normalize, Resize, ToTensor
+import random
+import numpy as np
 
+def set_seed(seed: int = 42):
+    """Enable reproducibility by setting the seed for random number generators."""
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed(42)
+        torch.cuda.manual_seed_all(42)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
 
 class ImageDataset(Dataset):
     def __init__(self, height):

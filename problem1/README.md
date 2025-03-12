@@ -30,9 +30,11 @@ Using your knowledge from the paper, do the following:
 - Implement all missing functions in the `problem_1_*.py` files
   - Implement a SIREN (`problem_1_siren.py`)
   - Implement a bog-standard feed-forward MLP (`problem_1_mlp.py`)
-  - Implement derivative-calculating functions (`problem_1_gradient.py`)
+  - Implement derivative-calculating functions (`problem_1_gradient.py`, you will need SIREN and MLP already implemented if you want to unit test this)
   - Implement a flexible MLP/SIREN training loop (`problem_1_train.py`)
 - Run the notebook `benchmark.ipynb` to check your functions and visualize the training process
+
+**Testing**. You are provided an optional suite of unit tests in `test_sanity.py` which check that your functions work properly and that your multiple choice YAML is properly formatted. Use them with `pytest .` to help debug your code, but they will not be used to grade. You can also look at some example outputs in `should_look_like/`. The unit tests use regression-testing based on a "correct" solution by the TAs and the serialized expected outputs are saved in `test_data/` so do not modfiy that folder. To run all tests except the slowest one, use `pytest . -k "not initialization"`.
 
 ### Short-answer questions
 

@@ -51,6 +51,3 @@ def laplace(y: torch.Tensor, x: torch.Tensor) -> torch.Tensor:
     `Gradient` section of Wikipedia: https://en.wikipedia.org/wiki/Laplace_operator#Generalization.
     """
     raise NotImplementedError("Not implemented!")
-
-
-

@@ -4,6 +4,12 @@ Implement a neural field using a SIREN.
 The SIREN maps from `in_features`-dimensional points (e.g., 2D xy positions)
 to `out_features`-dimensional points (e.g., 1D color values). Pay special
 attention to the paper linked in the README when implementing this model.
+
+Some conventions we use that you will need to follow IF you want to use the unit tests:
+1. If the last layer is linear, then it always has a bias (other terms have a bias IFF self.bias is True)
+2. There is one layer from `in_features` to `hidden_features` and then `hidden_layers` layers from 
+    `hidden_features` to `hidden_features`; the last layer (which could be linear or not) is from
+    `hidden_features` to `out_features`.
 """
 
 import torch
