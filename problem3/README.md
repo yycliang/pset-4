@@ -33,6 +33,8 @@ pip install -r requirements.txt
 
 Please fill in several lines of code in  `src/components/positional_encoding.py` to implement a Positional Encoding described in Equation (4) of paper:  [Neural Radiance Fields, Mildenhall et al., 2020](https://arxiv.org/abs/2003.08934).  Attach the filled-in code in the submission report.
 
+You need also to copy the SineLayer implementation in problem-1 to `problem3/src/components/sine_layer.py`. 
+
 After your implementation, please run to test it.
 
 `python -m tests.test_positional_encoding`
