@@ -16,7 +16,7 @@ import torch
 import torch.nn as nn
 import jaxtyping
 from typing import Tuple
-
+import numpy as np
 
 class SineLayer(nn.Module):
     def __init__(
@@ -38,10 +38,21 @@ class SineLayer(nn.Module):
         Initialize the weights of the layer according to the scheme
         described in the SIREN paper.
         """
-        raise NotImplementedError("Not implemented!")
+        # raise NotImplementedError("Not implemented!")
+        ## creating th bound 
+        if is_first_layer:
+            bound = (1/ in_features) 
+        else: 
+            ## initalize th othr hidden layers
+            bound = (np.sqrt(6/in_features)) /self.omega_0
+        ## set the bound 
+        self.linear.weight.uniform_(-bound, bound)
+        ## getting tolrance issue errors
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        raise NotImplementedError("Not implemented!")
+        # raise NotImplementedError("Not implemented!")
+        ## the forward pass wth omega0 and linear 
+        return torch.sin(self.omega_0 * self.linear(x))
 
 
 class SIREN(nn.Module):
@@ -72,7 +83,47 @@ class SIREN(nn.Module):
         """
         Build the network according to the provided hyperparameters.
         """
-        raise NotImplementedError("Not implemented!")
+        # raise NotImplementedError("Not implemented!")
+        final_layers = []
+        ## diff freq factor
+        final_layers.append(
+            SineLayer(
+                self.in_features, 
+                self.hidden_features, 
+                bias=self.bias, 
+                is_first_layer=True, 
+                omega_0=self.first_omega_0
+            )
+        )
+        ## the hidden layrs
+        for i in range(self.hidden_layers):
+            final_layers.append(
+                SineLayer(
+                    self.hidden_features, 
+                    self.hidden_features, 
+                    bias=self.bias, 
+                    is_first_layer=False, 
+                    omega_0=self.hidden_omega_0
+                )
+            )
+        #3 for th last layer
+        if self.last_layer_linear: 
+            final_layers.append(nn.Linear(
+                self.hidden_features, 
+                self.out_features, 
+                bias=True
+            ))
+        else: 
+            final_layers.append(
+                SineLayer(
+                    self.hidden_features,
+                    self.out_features, 
+                    bias=True, 
+                    is_first_layer=False, 
+                    omega_0=self.hidden_omega_0,
+                )
+            )
+        return nn.Sequential(*final_layers)
 
     def forward(self, coords: jaxtyping.Float[torch.Tensor, "N D"]) -> Tuple[
         jaxtyping.Float[torch.Tensor, "N out_features"],
@@ -89,4 +140,23 @@ class SIREN(nn.Module):
         -1 means "furthest left" or "furthest bottom" (depending on the dimension) and 1 means "furthest right"
         or "furthest top".
         """
-        raise NotImplementedError("Not implemented!")
+        # raise NotImplementedError("Not implemented!")
+        #the input coords have the grads
+        coordinates = coords.clone().detach().requires_grad_(True)
+        #  adjust input shape to match infeatures
+        if coordinates.shape[1] < self.in_features:
+            # Expand th edimess if input has fewer features than expected
+            coordinates = coordinates.expand(-1,self.in_features)
+        elif coordinates.shape[1] > self.in_features:
+            # Reduce dimes if input has more features than expected
+            projection_layer = torch.nn.Linear(
+                coordinates.shape[1], 
+                self.in_features, 
+                bias=False
+            ).to(coordinates.device)
+            coordinates = projection_layer(coordinates)
+        # Forwardpass through the model
+        outputs = self.net(coordinates)
+        return outputs, coordinates
+    
+    

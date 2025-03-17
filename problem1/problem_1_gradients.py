@@ -28,7 +28,18 @@ def gradient(y: torch.Tensor, x: torch.Tensor) -> torch.Tensor:
     above, you will need to set a specific boolean parameter to one of two options. Can you
     read the documentation and figure out which one and why?
     """
-    raise NotImplementedError("Not implemented!")
+    # raise NotImplementedError("Not implemented!")
+    ## gradi out
+    gradient_output = torch.ones_like(y)
+    ## using torch.autograd.grad
+    gradient = torch.autograd.grad(
+        outputs=y, inputs=x, grad_outputs=gradient_output, create_graph=True
+    )[0]
+    ## first
+    ##issue with th tensor
+    if gradient is None: 
+        gradient = torch.zeros_like(x)
+    return gradient
 
 def divergence(y: torch.Tensor, x: torch.Tensor) -> torch.Tensor:
     """
@@ -40,7 +51,20 @@ def divergence(y: torch.Tensor, x: torch.Tensor) -> torch.Tensor:
     Hint: You may find the ` torch.autograd.grad` function useful. Like in `gradient`,
     you need to set a specific boolean parameter to the correct out of two options.
     """
-    raise NotImplementedError("Not implemented!")
+    # raise NotImplementedError("Not implemented!")
+    ## find grad
+    divergence_t = torch.zeros_like(y[..., 0])
+    ## for each thing in th vector field
+    for i in range(y.shape[-1]): 
+        ## now use the torch.auto
+        y_ref = y[..., i]
+        grad_index = torch.autograd.grad(y_ref, x, 
+                                         grad_outputs=torch.ones_like(y_ref), 
+                                         create_graph=True, retain_graph=True)[0]
+        ## the diagonal values out 
+        divergence_t += grad_index[..., i]      
+    ## return final 
+    return divergence_t                             
 
 def laplace(y: torch.Tensor, x: torch.Tensor) -> torch.Tensor:
     """
@@ -50,4 +74,9 @@ def laplace(y: torch.Tensor, x: torch.Tensor) -> torch.Tensor:
     Hint: You may find some of our previous functions useful and the identity in the
     `Gradient` section of Wikipedia: https://en.wikipedia.org/wiki/Laplace_operator#Generalization.
     """
-    raise NotImplementedError("Not implemented!")
+    # raise NotImplementedError("Not implemented!")
+    ## usegrad
+    dydx = gradient(y, x)
+    ## divrgnce 
+    laplacian = divergence(dydx, x)
+    return laplacian

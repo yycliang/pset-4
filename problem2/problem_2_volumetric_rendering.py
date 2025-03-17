@@ -131,7 +131,9 @@ def camera_param_to_rays(c2w, intrinsics, H=128, W=128):
     # 3. Transform rays from camera space to world space using c2w
     # 4. Return ray origins and directions of shape [H, W, 3]
 
-    pass
+    
+
+    return
 
 
 ############################

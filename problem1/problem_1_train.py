@@ -43,4 +43,44 @@ def train(
 
     PSNR is defined here: https://en.wikipedia.org/wiki/Peak_signal-to-noise_ratio
     """
-    raise NotImplementedError("Not implemented!")
+    # raise NotImplementedError("Not implemented!")
+    ## dataset and dataloader start
+    dataloader = DataLoader(
+        dataset, 
+        batch_size=len(dataset), 
+        shuffle=True
+    )
+    ## initalize
+    if model == "MLP":
+        # making sure its cuda
+        model_net = MLP(**kwargs).to(device)
+    elif model == "SIREN": 
+        model_net = SIREN(**kwargs).to(device)
+    ## optimzer and loss function mse
+    optimizer = torch.optim.Adam(model_net.parameters(), lr=lr)
+    loss_func = torch.nn.MSELoss()
+    ## now the training
+    for step in range(1, total_steps + 1): 
+        ## go over dataloader coords
+        for coords, target in dataloader: 
+            ## to deivice
+            coords, target = coords.to(device), target.to(device)
+            ## enable th gradients in input
+            coords.requires_grad = True
+            ## forward passing
+            output = model_net(coords)[0]
+            ## find th loss now with th mse
+            mse_loss = loss_func(output,target)
+            ## now do th backprop
+            optimizer.zero_grad()
+            mse_loss.backward()
+            optimizer.step()
+        ## finding th psnr 
+        psnr_value = psnr(output,target)
+        ## logging at each stp of the way
+        if step % steps_til_summary == 0 or step == 1:
+            ## plot rconstruction and gradients 
+            plot(coords, output, gradient(output, coords), laplace(output, coords))
+            print(mse_loss.item())
+            print(psnr_value)
+    return model_net

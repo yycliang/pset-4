@@ -40,8 +40,27 @@ class MLP(nn.Module):
 
     def initialize_net(self):
         """Build the network according to the provided hyperparameters."""
-        raise NotImplementedError("Not implemented!")
-    
+        # raise NotImplementedError("Not implemented!")
+        final_layers = []
+        ## activate function 
+        ## picking the activ func
+        activation_func = getattr(nn, self.activation)()
+        ## first layer - hidden featuresfrom infeaturse
+        final_layers.append(nn.Linear(self.in_features, self.hidden_features, bias=self.bias))
+        final_layers.append(activation_func)
+        ## hiddenlayrs
+        for i in range(self.hidden_layers -1): 
+            ## appending
+            final_layers.append(nn.Linear(self.hidden_features, self.hidden_features, bias=self.bias))
+            final_layers.append(activation_func)
+        ## utput layer 
+        final_layers.append(nn.Linear(
+            self.hidden_features, 
+            self.out_features, 
+            bias=self.bias
+        ))
+        return nn.Sequential(*final_layers)
+
     def forward(self, coords: jaxtyping.Float[torch.Tensor, "N D"]) -> Tuple[
         jaxtyping.Float[torch.Tensor, "N out_features"],
         jaxtyping.Float[torch.Tensor, "N D"],
@@ -57,4 +76,11 @@ class MLP(nn.Module):
         -1 means "furthest left" or "furthest bottom" (depending on the dimension) and 1 means "furthest right"
         or "furthest top".
         """
-        raise NotImplementedError("Not implemented!")
+        # raise NotImplementedError("Not implemented!")
+        ## copied from the siren one
+        # ensure that the input coords have the grads
+        coordinates = coords.clone().detach().requires_grad_(True)
+        ## put it through thesiren network 
+        outputs = self.net(coordinates)
+        ##returen both 
+        return outputs, coordinates

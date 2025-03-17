@@ -1,0 +1,13 @@
+Why are the MLP reconstructions so much less detailed than those produced by the SIREN?
+
+The MLP reconstructions are much less detailed then the ones produced by the SIREN because 
+
+___
+
+
+The image Laplacian produced by the MLP looks strange... what's happening here and why?
+
+The image looks strange because 
+
+___
+

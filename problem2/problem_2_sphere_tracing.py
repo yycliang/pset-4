@@ -83,14 +83,36 @@ def camera_param_to_rays(c2w, intrinsics, H=128, W=128):
     # 2. Convert pixel coordinates to camera coordinates using intrinsics
     # 3. Transform camera coordinates to world coordinates using c2w
 
+    ## the intrisic values
+    fx, fy, cx, cy = intrinsics 
+    ## now th meshgrid
+    row, col = torch.meshgrid(
+        torch.arange(W), 
+        torch.arange(H), 
+        indexing="xy"
+    )
+    ## pixel coords to cam coords
+    x_cam_coords = (row, -cx) / fx
+    y_cam_coords = (col - cy)/fy 
+    ## start off pointing in cam space
+    z_cam_coords = 1
+    ## now th stacking
+    directions_cam = torch.stack(
+        [x_cam_coords, 
+         y_cam_coords, 
+         z_cam_coords], dim=-1
+    )
+    ## normalize it 
+    directions_cam = directions_cam/torch.norm(directions_cam, dim=-1, keepdim=True)
+    ## transofrming th dirsto world space using cam2world to gt directins
+    ray_directions = torch.einsum("ij, hwj -> hwi", c2w[:3, :3], directions_cam)
+    ## get the ray originslas 
+    ray_origins = c2w[:3,3].expand(H, W,3)
     return ray_origins, ray_directions
-
 
 ############################
 # Part B: Sphere Tracing
 ############################
-
-
 def sphere_tracing(
     ray_origins,
     ray_directions,
@@ -132,6 +154,16 @@ def sphere_tracing(
     # 4. Update t for each ray based on SDF value
     # 5. Stop marching when rays hit the surface or reach max iterations
     # 6. Reconstruct image from hit points
+    ##sett the rays 
+
+    # get the t values for the rays 
+    t = torch.full(
+        (H * W), 
+        t_near,
+        device=device
+    )
+    ## tfor rays marching checking
+    active_mask = torch.ones_like(t, dtype=torch.bool, device=device)
 
     return image
 
